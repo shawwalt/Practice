@@ -1,136 +1,160 @@
 #include<stdio.h>
-#include<stdlib.h> 
+#include<stdlib.h>
 
 typedef struct Equal{
-	int a;
-	int x;
-	struct Equal *next;
+	int coef;
+	int expo;
+	struct Equal*next;
 }Equal;
 
-Equal *add;
-Equal *mul;
+typedef Equal* Eptr;
+
+Eptr Create(Eptr first);
+Eptr Mul(Eptr p1,Eptr p2);
+Eptr Add(Eptr p1,Eptr p2);
 
 int main()
 {
-	Equal *a=NULL,*b=NULL,*p,*q1,*q2;
-	int n,m;
-	scanf("%d",&n);
-	for(int i=0;i<n;i++){
-	    p=(Equal*)malloc(sizeof(Equal));
-	    scanf("%d%d",&p->a,&p->x);
-		p->next=NULL;
-		
-		if(!a){
-		    q1=a=p;
-		}
-		else {
-			q1->next=p;
-			q1=q1->next;
-		}
+	Eptr p1=NULL,p2=NULL,first,t;
+	p1=Create(p1);
+	p2=Create(p2);
+	t=first=Mul(p1,p2);
+	
+	if(first){
+		     
+	printf("%d %d",first->coef,first->expo);
+	first=first->next;;
+	free(t);
+	while(first){
+		printf(" %d %d",first->coef,first->expo);
+		t=first;
+		first=first->next;
+		free(t);
 	}
 	
-	scanf("%d",&m);
-	for(int i=0;i<m;i++){
-	    p=(Equal*)malloc(sizeof(Equal));
-	    scanf("%d%d",&p->a,&p->x);
-		p->next=NULL;
-		
-		if(!b){
-		    q2=b=p;
-		}
-		else {
-			q2->next=p;
-			q2=q2->next;
-		}
 	}
-	
-	Equal *t;
-	p=mul=(Equal*)malloc(sizeof(Equal));
-	p->next=NULL;
-	for(q1=a;q1!=NULL;q1=q1->next)
-	for(q2=b;q2!=NULL;q2=q2->next){
-		t=(Equal*)malloc(sizeof(Equal));
-		t->a=(q1->a)*(q2->a);
-		t->x=(q1->x)+(q2->x);
-		t->next=NULL;
-		while(p){
-			
-			if(p&&p->x==t->x){
-				p->a+=t->a;
-				free(t);break;
-			}else if(p->next&&t->x>p->next->x){
-				t->next=p->next;
-				p->next=t;break;
-			}else if(!p->next){
-				(*p)=(*t);
-				free(t);
-				p->next=(Equal*)malloc(sizeof(Equal));
-				p=p->next;
-				p->next=NULL;
-				p=mul;break;
-			}else p=p->next;
-			
-		}
-	}
-	
-	q1=a;q2=b;
-	p=add=(Equal*)malloc(sizeof(Equal));
-	p->next=NULL;
-	while(q1||q2){
-		if(q1&&q2){
-			if(q1->x>q2->x){
-				(*p)=(*q1);
-				q1=q1->next;
-				p->next=(Equal*)malloc(sizeof(Equal));
-				p=p->next;
-				p->next=NULL;
-			}else if(q1->x<q2->x){
-				(*p)=(*q2);
-				q2=q2->next;
-				p->next=(Equal*)malloc(sizeof(Equal));
-				p=p->next;
-				p->next=NULL;
-			}else {
-				p->x=q1->x;
-				p->a=(q1->a)+(q2->a);
-				q1=q1->next;
-				q2=q2->next;
-				p->next=(Equal*)malloc(sizeof(Equal));
-				p=p->next;
-				p->next=NULL;
-			}
-		}
-		else{
-			if(q1){
-				(*p)=(*q1);
-				q1=q1->next;
-				p->next=(Equal*)malloc(sizeof(Equal));
-				p=p->next;
-				p->next=NULL;
-			}
-			else if(q2){
-				(*p)=(*q2);
-				q2=q2->next;
-				p->next=(Equal*)malloc(sizeof(Equal));
-				p=p->next;
-				p->next=NULL;
-			}
-		}
-	}
-	p=mul;
-	printf("%d %d",p->a,p->x);
-	p=p->next;
-	for(;p->next;p=p->next){
-		printf(" ");
-		printf("%d %d",p->a,p->x);
-	}
+	else printf("0 0");
 	printf("\n");
-	p=add;
-	printf("%d %d",p->a,p->x);
-	p=p->next;
-	for(;p->next;p=p->next){
-		printf(" ");
-		printf("%d %d",p->a,p->x);
+	first=Add(p1,p2);
+	if(first){
+		printf("%d %d",first->coef,first->expo);
+		first=first->next;
+		while(first){
+			printf(" %d %d",first->coef,first->expo);
+			t=first;
+			first=first->next;
+			free(t);
+		}
 	}
+	else printf("0 0");
+		
 	return 0;
+} 
+
+Eptr Create(Eptr first)
+{
+	int e,c,n;
+	scanf("%d",&n);
+	if(n==0)return NULL;
+	Eptr temp=first=(Eptr)malloc(sizeof(Equal));
+	while(n){
+		scanf("%d%d",&c,&e);
+		first->next=(Eptr)malloc(sizeof(Equal));
+	    first=first->next;
+	    first->coef=c;
+	    first->expo=e;
+	    n--;
+	}
+	first->next=NULL;
+	first=temp->next;
+	free(temp);
+	return first;
 }
+
+Eptr Mul(Eptr p1,Eptr p2)
+{
+	Eptr front=p2,first=NULL,last=NULL;
+	if(!p1||!p2)return NULL;
+	first=last=(Eptr)malloc(sizeof(Equal));
+	while(p2){
+		last->next=(Eptr)malloc(sizeof(Equal));
+		last=last->next;
+		last->coef=p1->coef*p2->coef;
+		last->expo=p1->expo+p2->expo;
+		p2=p2->next;
+	}
+	last->next=NULL;
+	last=first;
+	first=first->next;
+	free(last);
+	
+	Eptr t,t1;
+	p1=p1->next;
+	for(;p1;p1=p1->next)
+	for(p2=front;p2;p2=p2->next){
+		t=(Eptr)malloc(sizeof(Equal));
+		t->coef=p1->coef*p2->coef;
+		t->expo=p1->expo+p2->expo;
+		
+		t1=first;
+		while(t1->next&&t->expo<t1->next->expo)t1=t1->next;
+		
+		if(t1->next&&t1->next->expo==t->expo){
+			t1->next->coef+=t->coef;
+			free(t);
+			if(!t1->next->coef){
+				t=t1->next;
+				t1->next=t->next;
+				free(t);
+			}
+		}
+		else {
+			t->next=t1->next;
+			t1->next=t;
+		}
+	}
+	
+	return first;
+}
+
+Eptr Add(Eptr p1,Eptr p2)
+{
+	Eptr first=(Eptr)malloc(sizeof(Equal)),t;
+	Eptr last=first;
+	while(p1&&p2){
+		if(p1->expo>p2->expo){
+			last->next=(Eptr)malloc(sizeof(Equal));
+			last=last->next;
+			*last=*p1;
+			p1=p1->next;
+		}
+		else if(p1->expo==p2->expo){
+			last->next=(Eptr)malloc(sizeof(Equal));
+			last->next->coef=p1->coef+p2->coef;
+			last->next->expo=p1->expo;
+			if(!(last->next->coef)){
+				free(last->next);
+				last->next=NULL;
+			}
+			p1=p1->next;
+			p2=p2->next;
+			if(last->next)
+			last=last->next;
+		}
+		else {
+			last->next=(Eptr)malloc(sizeof(Equal));
+			last=last->next;
+			*last=*p2;
+			p2=p2->next;
+		}
+	}
+	
+	if(p1)last->next=p1;
+	else last->next=p2;
+	
+	last=first;
+	first=first->next;
+	free(last);
+	return first;
+}
+
